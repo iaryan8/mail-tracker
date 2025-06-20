@@ -1,0 +1,42 @@
+<!-- test.html -->
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Mail Tracker Test</title>
+</head>
+<body>
+  <h2>📬 Mail Tracker Test Page</h2>
+  <button onclick="sendMail()">📨 Send Test Mail</button>
+
+  <script>
+    function sendMail() {
+      const mailId = Date.now();
+      const email = "test@example.com";
+      const url = `http://localhost:5000/create_mail?id=${mailId}&email=${encodeURIComponent(email)}`;
+
+      fetch(url)
+        .then(response => {
+          if (response.ok) {
+            console.log("✅ Mail registered");
+            insertPixel(mailId);
+          } else {
+            console.error("❌ Server error:", response.status);
+          }
+        })
+        .catch(err => {
+          console.error("❌ Network error:", err);
+        });
+    }
+
+    function insertPixel(mailId) {
+      const pixel = document.createElement("img");
+      pixel.src = `http://localhost:5000/track?id=${mailId}`;
+      pixel.width = 1;
+      pixel.height = 1;
+      pixel.style.display = "none";
+      document.body.appendChild(pixel);
+      console.log("🟢 Pixel inserted with ID:", mailId);
+    }
+  </script>
+</body>
+</html>
