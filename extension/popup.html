@@ -2,47 +2,187 @@
 <html>
 <head>
     <title>Mail Tracker</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --primary-color: #2563eb;
+            --success-color: #22c55e;
+            --error-color: #ef4444;
+            --text-color: #1f2937;
+            --border-color: #e2e8f0;
+        }
+
         body {
-            font-family: Arial, sans-serif;
-            padding: 10px;
-            width: 500px;
+            font-family: 'Inter', sans-serif;
+            padding: 1.5rem;
+            width: 320px;
+            margin: 0;
+            background-color: #f8fafc;
+            color: var(--text-color);
         }
-        #trackingToggle {
-            margin-top: 10px;
+
+        .header {
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
         }
-        #statusText {
-            margin-top: 10px;
-            font-weight: bold;
+
+        h3 {
+            margin: 0;
+            font-size: 1.25rem;
+            font-weight: 600;
         }
-        #statusBtn, #saveBtn {
-            margin-top: 15px;
-            padding: 6px 12px;
+
+        .container {
+            background-color: white;
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .toggle-container {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+            padding: 0.75rem;
+            background-color: #f8fafc;
+            border-radius: 0.5rem;
+        }
+
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 44px;
+            height: 24px;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #cbd5e1;
+            transition: .4s;
+            border-radius: 24px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: var(--primary-color);
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(20px);
+        }
+
+        .status-text {
+            font-weight: 500;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: #475569;
+        }
+
+        input[type="email"] {
             width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--border-color);
+            border-radius: 0.5rem;
+            font-size: 0.875rem;
+            outline: none;
+            transition: border-color 0.2s;
         }
-        #recipientEmail {
+
+        input[type="email"]:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1);
+        }
+
+        .error-text {
+            color: var(--error-color);
+            font-size: 0.875rem;
+            margin-top: 0.5rem;
+            display: none;
+        }
+
+        button {
             width: 100%;
-            padding: 5px;
-            margin-top: 10px;
-            box-sizing: border-box;
+            padding: 0.75rem;
+            border: none;
+            border-radius: 0.5rem;
+            background-color: var(--primary-color);
+            color: white;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            margin-bottom: 0.75rem;
+        }
+
+        button:hover {
+            background-color: #1d4ed8;
+        }
+
+        .success-message {
+            color: var(--success-color);
+            font-size: 0.875rem;
+            margin-top: 0.5rem;
+            display: none;
         }
     </style>
 </head>
 <body>
-    <h3>📬 Mail Tracker</h3>
-    
-    <label>
-        <input type="checkbox" id="trackingToggle">
-        Enable Tracking
-    </label>
-    
-    <div id="statusText">Tracking is OFF</div>
+    <div class="header">
+        <h3>📬 Mail Tracker</h3>
+    </div>
 
-    <label for="recipientEmail">Recipient Email:</label>
-    <input type="email" id="recipientEmail" placeholder="e.g. amit@gmail.com" required />
-    <button id="saveBtn">Save Recipient</button>
+    <div class="container">
+        <div class="toggle-container">
+            <label class="toggle-switch">
+                <input type="checkbox" id="trackingToggle">
+                <span class="slider"></span>
+            </label>
+            <span class="status-text" id="statusText">Tracking is OFF</span>
+        </div>
 
-    <button id="statusBtn">Open Dashboard</button>
+        <div class="form-group">
+            <label for="recipientEmail">Recipient Email:</label>
+            <input type="email" id="recipientEmail" placeholder="e.g. recipient@example.com" required>
+            <div id="emailError" class="error-text"></div>
+            <div id="successMessage" class="success-message"></div>
+        </div>
+
+        <button id="saveBtn">Save Recipient</button>
+        <button id="statusBtn">View Dashboard</button>
+    </div>
 
     <script src="popup.js"></script>
 </body>

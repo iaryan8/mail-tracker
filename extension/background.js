@@ -1,70 +1,50 @@
-// console.log('✅ ');
-// console.log('✅ ');
-// console.log('✅ ');
-// console.log('✅ ');
-// browser.runtime.onMessage.addListener(function (request, sender, sendResponse) {
-//   if (request.action === 'storeEmail') {
-//     console.log("📥 Received message in background.js:", request);
-//     console.log('✅ ');
-    
-  
-//     fetch('https://mail-tracker-production-7e26.up.railway.app/store', {
-//       method: 'POST',
-//       headers: { 'Content-Type': 'application/json' },
-//       body: JSON.stringify({
-//         subject: request.subject,
-//         to: request.to,
-//         content: request.content,
-//         id: request.id
-//       })
-//     })
-//     .then(response => {
-//       if (!response.ok) {
-//         console.error("❌ Server returned error:", response.status);
-//       } else {
-//         console.log('✅ Email data successfully sent to Flask:', response.status);
-//       }
-//     })
-//     .catch(error => {
-//       console.error('❌ Error sending email data to Flask:', error);
-//     });
-//   }
-// });
-// console.log('✅ ');
+const SERVER_HOST = 'https://mail-tracker-production-7e26.up.railway.app';
 
-console.log('✅ Background script loaded');
-console.log('✅ Ready to receive messages');
+// Helper function to log messages
+function log(message, type = 'info') {
+    const icon = {
+        info: 'ℹ️',
+        success: '✅',
+        warning: '⚠️',
+        error: '❌'
+    }[type];
+    console.log(`${icon} Background: ${message}`);
+}
 
-browser.runtime.onMessage.addListener((request, sender, sendResponse) => {
-  if (request.action === 'storeEmail') {
-    console.log("📥 Received message in background.js:", request);
+// Handle messages from content script
+browser.runtime.onMessage.addListener(async (message, sender) => {
+    if (message.action === 'storeEmail') {
+        try {
+            log(`Processing email data for ID: ${message.id}`, 'info');
+            
+            const response = await fetch(`${SERVER_HOST}/store`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    subject: message.subject,
+                    to: message.to,
+                    content: message.content,
+                    id: message.id
+                })
+            });
 
-    fetch('https://mail-tracker-production-7e26.up.railway.app/store', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        subject: request.subject,
-        to: request.to,
-        content: request.content,
-        id: request.id
-      })
-    })
-    .then(response => {
-      console.log("📡 Response received:", response);
-      return response.text().then(text => {
-        console.log("📩 Response text:", text);
+            const responseText = await response.text();
+            
+            if (!response.ok) {
+                throw new Error(`Server responded with status ${response.status}: ${responseText}`);
+            }
 
-        if (!response.ok) {
-          console.error("❌ Server error:", response.status, text);
-        } else {
-          console.log("✅ Email data successfully sent to Flask:", response.status);
+            log(`Email tracking data stored for ID: ${message.id}`, 'success');
+            return true;
+
+        } catch (error) {
+            log(`Failed to store email data: ${error.message}`, 'error');
+            return false;
         }
-      });
-    })
-    .catch(error => {
-      console.error("❌ Fetch failed:", error);
-    });
-  }
+    }
 });
 
-console.log('✅ Listener registered');
+// Log extension initialization
+log('Background script initialized', 'success');
